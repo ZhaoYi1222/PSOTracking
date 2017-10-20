@@ -8,10 +8,10 @@ void tracker(Point p1, Point p2)
 	srand(time(NULL));
 	int width = p2.x - p1.x+1;
 	int height = p2.y - p1.y+1;
-	double vxmin = -(p2.x - p1.x)*2;
-	double vymin = -(p2.y - p1.y)*2;
-	double vxmax = (p2.x - p1.x)*2;
-	double vymax = (p2.y - p1.y)*2;
+	double vxmin = -(p2.x - p1.x);
+	double vymin = -(p2.y - p1.y);
+	double vxmax = (p2.x - p1.x);
+	double vymax = (p2.y - p1.y);
 	
 	
 
@@ -52,7 +52,9 @@ void tracker(Point p1, Point p2)
 		Mat dst = image_new.reshape(0, image_new.rows*image_new.cols);
 		Mat tmp = ob[1].targetobserve.t();
 
+		
 		Mat tmp1;
+		/*
 		if (tmp.rows == 20&&0)
 		{
 			tmp1 = tmp(Rect(Point(0, 1), Point(tmp.cols - 1, 20)));
@@ -61,6 +63,8 @@ void tracker(Point p1, Point p2)
 		{
 			tmp1 = tmp;
 		}
+		*/
+		tmp1 = tmp;
 		Mat ttmp = dst.t();
 		tmp1.convertTo(tmp1, CV_8UC1);
 		tmp1.push_back(ttmp);
@@ -117,6 +121,10 @@ void tracker(Point p1, Point p2)
 
 
 				pa[1][i].fitness = pow(exp, -sqrt(res));
+
+				//cout << "fitness=" << pa[1][i].fitness << endl;
+
+
 				if (pa[1][i].fitness > pa[1][i].pbest)
 				{
 					pa[1][i].pbest = pa[1][i].fitness;
@@ -144,6 +152,7 @@ void tracker(Point p1, Point p2)
 			}
 
 			//printf("gbest=%f\n", pa[1][1].gbest);
+			cout << "gbest=" << pa[1][1].gbest << endl;
 
 
 			double w = 0.729844;
@@ -170,8 +179,6 @@ void tracker(Point p1, Point p2)
 		p1.y = pa[1][1].gbesty - height / 2;
 		p2.x = pa[1][1].gbestx + width / 2 - (width & 1 ? 0 : 1);
 		p2.y = pa[1][1].gbesty + height / 2 - (height & 1 ? 0 : 1);
-
-
 
 
 
@@ -219,14 +226,6 @@ void tracker(Point p1, Point p2)
 		*/
 
 
-
-
-
-
-		
-
-
-		
 		rectangle(img1, p1, p2, Scalar(0, 0, 255), 2, 8, 0);
 		imshow(Window_Name, img1); waitKey(1);
 		
