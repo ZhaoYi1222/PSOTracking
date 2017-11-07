@@ -1,7 +1,7 @@
 #include "PSO.h"
+#define numofarea 2
 
-
-void tracker(Point p1, Point p2);
+void tracker();
 
 vector<Point> capturePoint;
 Mat img, image;
@@ -20,32 +20,42 @@ void onMouse(int event, int x, int y, int flags, void* param)
 		break;
 
 	}
-	if (capturePoint.size() == 2) {
+	if (capturePoint.size() == 2*numofarea) {
 		flag = true;
-		Point p2 = capturePoint.back();
-		capturePoint.pop_back();
-		Point p1 = capturePoint.back();
-		capturePoint.pop_back();
-		
-		Rect rect(p1, p2);
-		Mat image_cut = img(rect);
-		Mat image_new;
-		image_cut.copyTo(image_new);
-		Mat dst = image_new.reshape(0, image_new.rows*image_new.cols);	
-		Mat tmp = ob[1].targetobserve.t();
-		Mat ttmp = dst.t();
-		ttmp.convertTo(ttmp, CV_8UC1);
-		tmp.push_back(ttmp);
-		tmp.convertTo(tmp, CV_8UC1);
-		ob[1].targetobserve=tmp.t();
 
-		cout << ob[1].targetobserve.rows << ":" << ob[1].targetobserve.cols << endl;
-		
-		cout << "OK!" << endl;
-		rectangle(image, p1, p2, Scalar(0, 0, 255), 2, 8, 0);
+		for (int i = 1; i <= numofarea; ++i)
+		{
+			
+			area[i].pr = capturePoint.back();
+			capturePoint.pop_back();
+			area[i].pl = capturePoint.back();
+			capturePoint.pop_back();
+
+			Rect rect(area[i].pl, area[i].pr);
+			Mat image_cut = img(rect);
+			Mat image_new;
+			image_cut.copyTo(image_new);
+			Mat dst = image_new.reshape(0, image_new.rows*image_new.cols);
+			Mat tmp = ob[i].targetobserve.t();
+			Mat ttmp = dst.t();
+			ttmp.convertTo(ttmp, CV_8UC1);
+			tmp.push_back(ttmp);
+			tmp.convertTo(tmp, CV_8UC1);
+			ob[i].targetobserve = tmp.t();
+
+			cout << ob[i].targetobserve.rows << ":" << ob[i].targetobserve.cols << endl;
+
+			cout << "OK!" << endl;
+			rectangle(image, area[i].pl, area[i].pr, Scalar(0, 0, 255), 2, 8, 0);
+			/*
+			cout << area[i].pl.x << " " <<  area[i].pl.y << endl;
+			cout << area[i].pr.x << " " << area[i].pr.y << endl;
+			cout << endl;
+			*/
+		}
+		//rectangle(image, area[1].pl, area[1].pr, Scalar(0, 0, 255), 2, 8, 0);
 		imshow(Window_Name, image);
-	
-		tracker(p1, p2);
+		tracker();
 	}
 }
 
@@ -53,7 +63,7 @@ void onMouse(int event, int x, int y, int flags, void* param)
 int main()
 {
 	capturePoint.clear();
-	const char* targetImg = "pic4/0001.jpg";
+	const char* targetImg = "pic5/0001.jpg";
 	image = imread(targetImg);
 	if (image.empty())
 	{
